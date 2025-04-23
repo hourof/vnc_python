@@ -9,7 +9,6 @@ import time
 import pyautogui as ag
 import mouse
 from _keyboard import getKeycodeMapping
-
 # 画面周期
 IDLE = 0.05
 
