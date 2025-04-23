@@ -8,7 +8,7 @@ class YOLOv7:
     def __init__(self, path, conf_thres=0.7, iou_thres=0.5):
         self.conf_threshold = conf_thres
         self.iou_threshold = iou_thres
-        self.class_names = list(map(lambda x: x.strip(), open('../best.names', 'r').readlines()))
+        self.class_names = list(map(lambda x: x.strip(), open('best.names', 'r').readlines()))
         # Initialize model
         self.session = onnxruntime.InferenceSession(path, providers=['DmlExecutionProvider', 'CPUExecutionProvider'])
         model_inputs = self.session.get_inputs()

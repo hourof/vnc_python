@@ -11,6 +11,7 @@ import cv2
 import time
 import sys
 import platform
+from yolov5 import yolov5_fp32
 #ip地址
 ip_address = "192.168.5.2:80"
 #创建主窗口

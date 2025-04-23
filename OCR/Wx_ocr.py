@@ -7,7 +7,11 @@ from wechat_ocr.ocr_manager import OcrManager, OCR_MAX_TASK_ID
 wechat_ocr_dir = "C:\\Users\\user\\AppData\\Roaming\\Tencent\\WeChat\\XPlugin\\Plugins\\WeChatOCR\\7079\\extracted\\WeChatOCR.exe"
 wechat_dir = "C:\\Program Files\\Tencent\WeChat\\[3.9.12.51]"
 
-
+#获取当前文件(main.py)所在的目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+print(current_dir)
+img_path = os.path.join(current_dir, "..", "img", "1.jpg")
+print("你好",img_path)
 def ocr_result_callback(img_path: str, results: dict):
     result_file = os.path.basename(img_path) + ".json"
     print(f"识别成功，img_path: {img_path}, result_file: {result_file}")
@@ -26,7 +30,7 @@ def main():
     # 启动ocr服务
     ocr_manager.StartWeChatOCR()
     # 开始识别图片
-    ocr_manager.DoOCRTask("1.jpg")
+    ocr_manager.DoOCRTask("../img/1.jpg")
     time.sleep(1)
     while ocr_manager.m_task_id.qsize() != OCR_MAX_TASK_ID:
         pass
