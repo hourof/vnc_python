@@ -13,6 +13,9 @@ import time
 import sys
 import platform
 
+#ip地址
+ip_address = "192.168.5.2:80"
+
 #创建主窗口
 root = tkinter.Tk()
 
@@ -44,8 +47,7 @@ soc = None
 
 socks5 = None
 
-#ip地址
-ip_address = "192.168.5.2:80"
+
 
 # 平台
 PLAT = b''
@@ -212,68 +214,7 @@ val.set(ip_address)
 last_send = time.time()
 
 
-def BindEvents(canvas):
-    global soc, scale
-    '''
-    处理事件
-    '''
-    def EventDo(data):
-        soc.sendall(data)
-    # 鼠标左键
 
-    def LeftDown(e):
-        return EventDo(struct.pack('>BBHH', 1, 100, int(e.x/scale), int(e.y/scale)))
-
-    def LeftUp(e):
-        return EventDo(struct.pack('>BBHH', 1, 117, int(e.x/scale), int(e.y/scale)))
-    canvas.bind(sequence="<1>", func=LeftDown)
-    canvas.bind(sequence="<ButtonRelease-1>", func=LeftUp)
-
-    # 鼠标右键
-    def RightDown(e):
-        return EventDo(struct.pack('>BBHH', 3, 100, int(e.x/scale), int(e.y/scale)))
-
-    def RightUp(e):
-        return EventDo(struct.pack('>BBHH', 3, 117, int(e.x/scale), int(e.y/scale)))
-    canvas.bind(sequence="<3>", func=RightDown)
-    canvas.bind(sequence="<ButtonRelease-3>", func=RightUp)
-
-    # 鼠标滚轮
-    if PLAT == b'win' or PLAT == 'osx':
-        # windows/mac
-        def Wheel(e):
-            if e.delta < 0:
-                return EventDo(struct.pack('>BBHH', 2, 0, int(e.x/scale), int(e.y/scale)))
-            else:
-                return EventDo(struct.pack('>BBHH', 2, 1, int(e.x/scale), int(e.y/scale)))
-        canvas.bind(sequence="<MouseWheel>", func=Wheel)
-    elif PLAT == b'x11':
-        def WheelDown(e):
-            return EventDo(struct.pack('>BBHH', 2, 0, int(e.x/scale), int(e.y/scale)))
-        def WheelUp(e):
-            return EventDo(struct.pack('>BBHH', 2, 1, int(e.x/scale), int(e.y/scale)))
-        canvas.bind(sequence="<Button-4>", func=WheelUp)
-        canvas.bind(sequence="<Button-5>", func=WheelDown)
-
-    # 鼠标滑动
-    # 100ms发送一次
-    def Move(e):
-        global last_send
-        cu = time.time()
-        if cu - last_send > IDLE:
-            last_send = cu
-            sx, sy = int(e.x/scale), int(e.y/scale)
-            return EventDo(struct.pack('>BBHH', 4, 0, sx, sy))
-    canvas.bind(sequence="<Motion>", func=Move)
-
-    # 键盘
-    def KeyDown(e):
-        return EventDo(struct.pack('>BBHH', e.keycode, 100, int(e.x/scale), int(e.y/scale)))
-
-    def KeyUp(e):
-        return EventDo(struct.pack('>BBHH', e.keycode, 117, int(e.x/scale), int(e.y/scale)))
-    canvas.bind(sequence="<KeyPress>", func=KeyDown)
-    canvas.bind(sequence="<KeyRelease>", func=KeyUp)
 
 
 def run():
@@ -301,7 +242,6 @@ def run():
     imgTK = ImageTk.PhotoImage(image=imi)
     cv = tkinter.Canvas(showcan, width=w, height=h, bg="white")
     cv.focus_set()
-    BindEvents(cv)
     cv.pack()
     cv.create_image(0, 0, anchor=tkinter.NW, image=imgTK)
     h = int(h * scale)
