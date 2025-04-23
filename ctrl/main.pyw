@@ -13,6 +13,7 @@ import time
 import sys
 import platform
 
+
 #ip地址
 ip_address = "192.168.5.2:80"
 
