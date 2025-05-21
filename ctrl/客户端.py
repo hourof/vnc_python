@@ -76,7 +76,7 @@ host_label.grid(row=0, column=0, padx=10, pady=10, ipadx=0, ipady=0)
 #显示画面按钮事件
 def ShowScreen():
     global showcan, root, soc, th, wscale
-    if showcan is None:
+    if showcan is None or not showcan.winfo_exists():
         wscale = True
         #创建一个新的窗口,用于显示画面
         showcan = tkinter.Toplevel(root)
@@ -88,6 +88,7 @@ def ShowScreen():
 
 #显示画面线程,用于程序不会卡死
 def run():
+    print("开启了run函数")
     global wscale, fixh, fixw, soc, showcan,tk_image
     #启动socket通信
     SetSocket()

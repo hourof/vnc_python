@@ -35,8 +35,17 @@ while True:
     decode_cv = cv2.imdecode(encode_cv, cv2.IMREAD_COLOR)
     branry_pack = struct.pack(">BI", 1, len(encode_cv))
     print("二进制打包数据",branry_pack)
-    dataSocket.sendall(branry_pack)
-    dataSocket.sendall(encode_cv)
+    try:
+        dataSocket.settimeout(5)
+        dataSocket.sendall(branry_pack)
+        dataSocket.sendall(encode_cv)
+    except Exception as e:
+        print("发送数据时出现错误",e)
+        #关闭socket通信
+        dataSocket.close()
+        #等待新的客户端连接
+        dataSocket, addr = listenSocket.accept()
+        print("接受了一个客户端连接",dataSocket,addr)
     #cv2.imshow("decode_cv", decode_cv)
 
     # if cv2.waitKey(20) & 0xff == ord('q'):
