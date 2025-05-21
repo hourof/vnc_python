@@ -8,7 +8,9 @@ class YOLOv7:
     def __init__(self, path, conf_thres=0.7, iou_thres=0.5):
         self.conf_threshold = conf_thres
         self.iou_threshold = iou_thres
-        self.class_names = list(map(lambda x: x.strip(), open('best.names', 'r').readlines()))
+        #self.class_names = list(map(lambda x: x.strip(), open('best.names', 'r').readlines()))
+        self.class_names = ['person', 'para', 'monster', 'jabe', 'alter', 'boos']
+        print(self.class_names)
         # Initialize model
         self.session = onnxruntime.InferenceSession(path, providers=['DmlExecutionProvider', 'CPUExecutionProvider'])
         model_inputs = self.session.get_inputs()
@@ -127,24 +129,31 @@ class YOLOv7:
         return boxes
 
     def draw_detections(self, image, boxes, scores, class_ids):
+        target_list = []
         for box, score, class_id in zip(boxes, scores, class_ids):
             x, y, w, h = box.astype(int)
+            # Draw rectangle  这xy是左上角坐标
+            cv2.circle(image,(x,y),5, (0,255,0), 1)
+            #当检测到图像时,就把图像写成yolo格式的文件截屏保存
 
-            # Draw rectangle
+            #然后定时器2秒,之后在开启新的截屏
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), thickness=2)
+            img_width = x +w
+            img_height = y +h
             label = self.class_names[class_id]
+            target_list.append([label, x, y, img_width, img_height ])
             label = f'{label} {int(score * 100)}%'
             labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
             # top = max(y1, labelSize[1])
             # cv.rectangle(frame, (left, top - round(1.5 * labelSize[1])), (left + round(1.5 * labelSize[0]), top + baseLine), (255,255,255), cv.FILLED)
             cv2.putText(image, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), thickness=2)
-        return image
+        return image,target_list
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--imgpath', type=str, default='images/0.jpg', help="image path")
-    parser.add_argument('--modelpath', type=str, default='model/best.onnx',
+    parser.add_argument('--imgpath', type=str, default='../img/1.jpg', help="image path")
+    parser.add_argument('--modelpath', type=str, default='../model/best.onnx',
                         choices=["models/yolov7_640x640.onnx", "models/yolov7-tiny_640x640.onnx",
                                  "models/yolov7_736x1280.onnx", "models/yolov7-tiny_384x640.onnx",
                                  "models/yolov7_480x640.onnx", "models/yolov7_384x640.onnx",

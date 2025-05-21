@@ -11,12 +11,20 @@ import cv2
 import time
 import sys
 import platform
-from yolov5 import yolov5_fp32
+from yolov5.yolov5_fp32 import  YOLOv7
 #ip地址
 ip_address = "192.168.5.2:80"
 #创建主窗口
 root = tkinter.Tk()
+# 加载模型路径
+model_path = "../model/best.onnx"
 
+# 设置置信度和 IOU 阈值
+confThreshold = 0.3
+nmsThreshold = 0.5
+
+# 初始化 YOLOv7 检测器
+yolov7_detector = YOLOv7(model_path, confThreshold, nmsThreshold)
 # 画面周期
 IDLE = 0.05
 
@@ -150,6 +158,7 @@ def ShowProxy():
         if socks5 == "":
             socks5 = None
         pr.destroy()
+    print("我被调用了")
     #创建一个新的顶级窗口 pr，作为设置 Socks5 代理的对话框。顶级窗口是一个独立的窗口，相对于主窗口 root
     pr = tkinter.Toplevel(root)
     #创建一个 StringVar 对象 s5v，用于存储和管理 Tkinter 小部件的字符串值
@@ -210,11 +219,6 @@ sca.set(100)
 val.set(ip_address)
 
 last_send = time.time()
-
-
-
-
-
 def run():
     global wscale, fixh, fixw, soc, showcan
     SetSocket()
@@ -235,7 +239,7 @@ def run():
     img = cv2.imdecode(data, cv2.IMREAD_COLOR)
     h, w, _ = img.shape
     fixh, fixw = h, w
-    imsh = cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)
+    imsh = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB)
     imi = Image.fromarray(imsh)
     imgTK = ImageTk.PhotoImage(image=imi)
     cv = tkinter.Canvas(showcan, width=w, height=h, bg="white")
@@ -271,7 +275,15 @@ def run():
                 # 差异传
                 img = img ^ ims
             imt = cv2.resize(img, (w, h))
-            imsh = cv2.cvtColor(imt, cv2.COLOR_RGB2RGBA)
+            imsh = cv2.cvtColor(imt, cv2.COLOR_RGBA2RGB)
+            cv2.imshow("img",imsh)
+            if cv2.waitKey(10) &0xff == ord('q'):
+                break
+            # 使用 YOLOv7 进行推理
+            #boxes, scores, class_ids = yolov7_detector.detect(img)
+
+            # 绘制检测框
+            #dstimg = yolov7_detector.draw_detections(img, boxes, scores, class_ids)
             imi = Image.fromarray(imsh)
             imgTK.paste(imi)
         except:
